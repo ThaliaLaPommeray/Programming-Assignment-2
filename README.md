@@ -6,6 +6,9 @@ The Strategy that is implemented in my program:
   If a guest goes through the labyringth and there is a cupcake at the end, that guest should only eat the cupcake if its their first time seeing the cupcake at the end of the labyrinth, after their first time having the cupcake they should no longer eat the cupcake should it be at the end of the labyrinth
   The leader will be the ONLY guest that requests a new cupcake after discovering the last cupcake has been eating and while doing so they also track how many cupcakes have been eaten. Once the number of cupcakes eaten = number of guests, Mr. Minotaur can then be notified that every guest has entered the labyrinth
   
+  For this implementation see pa2.java
+  line __ holds the value n or the amount of guests/threads in attendance, change it here as needed
+  
   
 
 Problem 2: Minotaur’s Crystal Vase (50 points):
