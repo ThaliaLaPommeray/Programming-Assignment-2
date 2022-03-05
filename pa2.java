@@ -1,22 +1,23 @@
 // Thalia La Pommeray
-
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
-
+import java.util.Random;
+import java.util.Scanner;
 public class pa2 {
 
     public static volatile int count;
     private static volatile int n;
     public static volatile int cake = 1;
+    public static volatile int t;
+    public static boolean [] visited;
+    public static int currentGuest;
 
     public static class myrun implements Runnable {
 
         @Override
         public synchronized void run() {
-            if (cake==1) {
-                cake=0;
+            if (cake == 0) {
+                cake = 1;
                 count++;
+               // System.out.println("one more has entered the labyrinth");
             }
         }
     }
@@ -25,21 +26,24 @@ public class pa2 {
 
         @Override
         public synchronized void run() {
-            if (cake==0) {
-                cake=1;
+            if (cake==1) {
+                cake=0;
+                visited[currentGuest] = true;
             }
         }
-
     }
 
     public static void main(String[] args) throws InterruptedException {
-
-        n = 5;
-        count = 1;
+        Random random = new Random();
+        Scanner sc = new Scanner(System.in);
+        System.out.println("How many Guests?");
+        n = sc.nextInt(); // number of Guests
+        count = 1; // tracking how many guest
         cake = 1;
-        int t = 0;
-        Thread[] threads = new Thread[n];
-        boolean [] visited = new boolean[n];
+        t = 0;
+        visited = new boolean[n];
+        Thread [] threads = new Thread[n];
+        int leader = random.nextInt(n);
 
         for (int m=0; m<n; m++){
             visited[m] = false;
@@ -48,39 +52,24 @@ public class pa2 {
         myrun lead = new myrun();
         myrun1 my = new myrun1();
 
-        boolean isT = true;
-        while (count<n-1){
-
-           // for(int t=0; t<=n; t++){
-                if (!isT) try {
-                    threads[t].join();
-                } catch (NullPointerException ignored) {}
-                else isT = false;
-                if (t==0){
-                    threads[t] = new Thread(lead);
-                    threads[t].start();
+        while (count<n){
+            currentGuest = random.nextInt(n);
+                if (currentGuest==leader){
+                    threads[currentGuest] = new Thread(lead);
+                    threads[currentGuest].start();
                 }
                 else{
-                    if (!visited[t]){
-                        threads[t] = new Thread(my);
-                        threads[t].start();
-                        visited[t] = true;
+                    if (!visited[currentGuest]){
+                        threads[currentGuest] = new Thread(my);
+                        threads[currentGuest].start();
                     }
-           //     }
                 }
-            t++;
-            if (t==(n+1)) t=0;
+
+                t++;
             }
 
-
-        for(t=0; t<=n; t++){
-            try {
-                threads[t].join();
-            }
-            catch (NullPointerException ignored) {}
-        }
-
-        if (count==n-1) System.out.println("Mr. Minotaur, All the guests have entered the labyrinth.");
+        if (count == n) System.out.println("Mr. Minotaur, All the guests have entered the labyrinth!");
+        System.out.printf("total labyrinth visits: %d", t);
 
     }
 
