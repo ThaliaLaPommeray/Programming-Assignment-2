@@ -1,12 +1,14 @@
-// Thalia La Pommeray
+package ddx.Multithreading;// Thalia La Pommeray
 
-package ddx.Multithreading;
-
+import javax.print.attribute.standard.PrinterMakeAndModel;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.Scanner;
+import java.util.Random;
 
 public class prob2{
     public static int n;
+    public static int t = 0;
+    public static boolean [] visited;
     public static class spinlock {
     private final AtomicReference<Thread> cas;
     spinlock(AtomicReference<Thread> cas){
@@ -15,11 +17,9 @@ public class prob2{
     public void lock() {
         Thread current = Thread.currentThread();
         while (!cas.compareAndSet(null, current)) {
-            // DO nothing
-            System.out.println("I am spinning");
+            t++;
         }
     }
-
     public void unlock() {
         Thread current = Thread.currentThread();
         cas.compareAndSet(current, null);
@@ -30,12 +30,29 @@ public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         System.out.println("How many Guests?");
         n = sc.nextInt();
+        Random random = new Random();
+        int guest;
+        visited = new boolean[n];
+        Thread [] threads = new Thread[n];
+        int count = 0;
+        int entries = 0;
+        for (int m=0; m<n; m++){visited[m]= false;}
         AtomicReference<Thread> cas = new AtomicReference<>();
 
-        for (int m = 0; m< n; m++){
-            Thread Curthread = new Thread(new Task(cas));
-            Curthread.start();
+        while (count<n){
+            guest = random.nextInt(n);
+            if (!visited[guest]){
+                visited[guest] = true;
+                count++;
+            }
+            threads[guest] = new Thread(new Task(cas));
+            threads[guest].start();
+            entries++;
         }
+
+
+        System.out.println("All guests have been in the showroom!");
+        System.out.printf("Number of showroom visits: %d", entries);
         }
 
 
@@ -51,8 +68,7 @@ static class Task implements Runnable {
     public void run() {
         slock.lock();
         for (int i = 0; i < n; i++) {
-            //Thread.yield();
-            System.out.println(i);
+            //System.out.println(i);
         }
         slock.unlock();
     }
